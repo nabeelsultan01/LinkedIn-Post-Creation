@@ -1,0 +1,542 @@
+{
+  "name": "linkedin",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "id": "091b1e04-6aa6-4440-abfe-65fc586f1ee9",
+      "name": "Google Gemini Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        96,
+        736
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "A5lYEC53e7csMvFo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "id": "8866eed9-fcb2-4a84-8a03-2be584b0ee50",
+      "name": "Google Gemini Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        592,
+        720
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "A5lYEC53e7csMvFo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Post Topic: {{ $json['Post Topic'] }}\nCategory: {{ $json.Category }}\nTarget Audience: {{ $json['Target Audience'] }}",
+        "options": {
+          "systemMessage": "=You are an AI agent specialized in generating trending, relevant, and engaging LinkedIn post topics.\n\nTask:\nGenerate **one unique LinkedIn post topic** based on the following:\n\n- Topic / Area: {{ $json['Post Topic'] }} / {{ $json.Category }}\n- Target Audience: {{ $json['Target Audience'] }}\n\n\n\n{\n  \"topics\": [\n    \"Your generated topic here\"\n  ]\n}\n\nThe topic should be:\n- Insightful, timely, and professional.\n- Short and precise (5–12 words).\n- Focused on education, thought leadership, or discussion starters.\n- Avoid generic or clickbait topics.\n- Dont add stars (**automation**)"
+        }
+      },
+      "id": "7e24ca8e-d838-473f-99c8-1feaea6a5963",
+      "name": "Content Topic Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        80,
+        512
+      ],
+      "typeVersion": 1.8
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an AI agent specialized in creating professional, engaging, and high-value LinkedIn posts.\n\nTask: Write a LinkedIn post based on the following topic:\n{{ $json.output }}\n\nThe LinkedIn post must follow these rules:\n\n- Write in clean plain text only. Do not use bullets, stars, asterisks, hyphens, numbered lists, bold formatting, or emojis.\n- Start with a strong hook written as a simple sentence or question.\n- Present 3–5 key insights in short, separate paragraphs instead of bullet points.\n- Make the post insightful, actionable, educational, and easy to read.\n- Keep the tone professional, conversational, and relevant for LinkedIn.\n- Length should be between 150 and 250 words.\n- Avoid jargon, unnecessary fillers, or clickbait.\n- End with a thoughtful question or call-to-action to encourage engagement.\n\nOutput only plain text paragraphs with no symbols or formatting.\n"
+            }
+          ]
+        }
+      },
+      "id": "4f50728a-877c-4d14-b063-8f52fff9fa6c",
+      "name": "Content Creator",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        592,
+        480
+      ],
+      "typeVersion": 1.6
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.8
+        }
+      },
+      "id": "5d4aaf06-1a0d-4c8c-bfca-005f635aa694",
+      "name": "Google Gemini Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        1232,
+        832
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "A5lYEC53e7csMvFo",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "ubdPDaIsQ_",
+        "text": "={{ $('Content Creator').item.json.text }}\n{{ $json.output.Hashtags }}\n",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "id": "53676a72-a787-46a2-a33e-b52e52eb58fe",
+      "name": "Create a post",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        1872,
+        496
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "zJtjU7EGS4gCyPNN",
+          "name": "LinkedIn account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "a42bc5e2-b728-4a2a-b1d3-637643237462",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1552,
+        496
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a world-class LinkedIn Growth and SEO Strategist.\n\n**Your Context:**\n- **Company:** Mohadd LogicOps\n- **Specialty:** Ai Automation, Wordpress Development\n- **Target Audience:** Solopreneurs, content creators, CEO, Business Owners and digital-first founders.\n- **Goal:** Maximize the visibility and engagement of our LinkedIn content with our ideal audience.\n\n**Your Task:**\nAnalyze the following LinkedIn post content and generate a strategic list of hashtags.\n\n**Post Content to Analyze:**\nTitle: {{ $('Content Topic Generator').item.json.output }}\nContent: \n{{ $json.text }}\n**Generate Hashtags in These 4 Categories:**\n1.  **Broad Industry (2-3 hashtags):** High-volume tags for wide reach (e.g., #AI, #Automation, #Marketing).\n2.  **Niche Topic (3-4 hashtags):** Specific tags directly related to the post's core message (e.g., #Cloud, #LinkedInStrategy, #AIworkflows).\n3.  **Target Audience (2-3 hashtags):** Tags your ideal customer follows or identifies with (e.g., #Solopreneur, #Startups, #FounderLife).\n4.  **Branded (1 hashtag):** A unique tag for our community (e.g., #Intuz).\n\nPlease ensure all hashtags start with # and are relevant to the provided content.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "283edd7a-564d-4733-9c76-e252c9dc96f0",
+      "name": "Hashtag Generator / SEO",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1232,
+        576
+      ],
+      "typeVersion": 1.8
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Generate an image for a linkedin post this is the description: {{ $json.text }} .The images should be download or generate for linkedin fro m any image source or google..",
+        "options": {
+          "size": "1024x1024"
+        }
+      },
+      "id": "f9c43fe7-3a2f-4126-aae3-01c6eb26d464",
+      "name": "Generate an image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1280,
+        384
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "uKvRMtiWU1l9hoBN",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "**LinkedIn Posts with Google Gemini Content & DALL-E Images**Before you get started, you'll need this:\n\n*   n8n Instance: A running n8n instance (cloud or self-hosted) to import and execute the workflow.\n    \n*   Google Gemini Account: For content topic generation, content creation, and hashtag generation (requires Google Gemini API Key) from Google AI Studios.\n    \n*   AI Image Generation Service Account: For creating images (e.g., OpenAI DALL-E API Key or similar service that the \"Generate an Image\" node uses).\n    \n*   Your LinkedIn Account: For publishing the generated posts (requires LinkedIn OAuth Credentials for n8n connection).",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "2626d854-5acc-4932-b209-238160018fd7",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -976,
+        352
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Generate Content Title\n-----------------------------------------------------------\n\n\n1.  Set up and apply your API key credentials to all “Google Gemini Chat Model” nodes for content topic. \n\n2. Once the API is updated, write your custom prompt into “Custom Topic Generator” based on your niche/target industry. \n\n3. Fill out the form and triggered.\n\n4. A unique topic for the post generation will be generated and connect with content generator node. \n\n\n",
+        "height": 740,
+        "width": 836,
+        "color": 7
+      },
+      "id": "cbbcf184-4eab-4679-9d68-e2020c4bfe93",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -432,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Generate Content from the Content Topics\n-----------------------------------------------------------\n\n\n1.  Content topic from the previous nodes lands here, and content will be generated per the topic. \n\n2. You are required to double click on Content Generator note, and insert your custom prompt, to set your tone, guidelines, type of content, style and all the necessary info. \n\n3. A flow router is used to send post to image generation as well as hashtag generator. \n\n",
+        "height": 748,
+        "width": 620,
+        "color": 7
+      },
+      "id": "758e4ad5-59c3-4025-b4b7-8fa78f076cda",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Image & Hashtag Generation\n-----------------------------------------------------------\n\n\n1.  Set your API key by double clicking on Generate an Image, and set up your API Key for DALL-E, or any other image generation tool.\n\n2. Update the custom prompt for the image, as well as the resolution.\n\n3. For the SEO Hashtag generation, double click on Hashtag Generator, and set your custom prompt for the hastags. \n\n",
+        "height": 888,
+        "width": 640,
+        "color": 7
+      },
+      "id": "a7714eab-85f5-4a83-9566-5d4260b2e12e",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1072,
+        128
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Connect Your LinkedIn\n-----------------------------------------------------------\n\n\n1.  Connect your LinkedIn by double clicking on LinkedIn Icon below. \n\n2. Set up and apply OAuth credentials to the “Create a post” node for your LinkedIn account.\n\n3. All the outputs from the previous nodes will be merged here, and will automatically publish a post. \n \n\n",
+        "height": 748,
+        "width": 680,
+        "color": 7
+      },
+      "id": "1f9fb096-0427-472d-80f8-d5b1abefa954",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1728,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "formTitle": "Create Post",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Post Topic"
+            },
+            {
+              "fieldLabel": "Category"
+            },
+            {
+              "fieldLabel": "Target Audience"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        512
+      ],
+      "id": "8f0b091a-26e7-44e7-a49a-3cb5addecbde",
+      "name": "On form submission",
+      "webhookId": "2a5d0e6e-6a64-435f-9b19-798224508aa7"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post title\": \"Exciting New Feature Launch 🚀\",\n  \"post content\": \"After months of collaboration, testing, and fine-tuning, we're thrilled to introduce our latest product feature: Smart Insights. It helps users uncover meaningful patterns in their data with just a few clicks. This wouldn't have been possible without our incredible team and supportive community. We're excited for what's next — and we'd love your feedback!\",\n  \"image description\": \"A laptop screen showcasing the new Smart Insights dashboard with colorful charts and graphs, surrounded by a team clapping in the background.\",\n\"Hashtags\":[\"#AI\",\"#Automation\"]\n}"
+      },
+      "id": "35a7b8e7-b6ec-4be4-805e-8149226bc0aa",
+      "name": "Structured Output Parser3",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1376,
+        800
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post title\": \"Exciting New Feature Launch 🚀\",\n  \"post content\": \"After months of collaboration, testing, and fine-tuning, we're thrilled to introduce our latest product feature: Smart Insights. It helps users uncover meaningful patterns in their data with just a few clicks. This wouldn't have been possible without our incredible team and supportive community. We're excited for what's next — and we'd love your feedback!\",\n  \"image description\": \"A laptop screen showcasing the new Smart Insights dashboard with colorful charts and graphs, surrounded by a team clapping in the background.\"\n}"
+      },
+      "id": "fade921d-3b7b-4f66-800a-88bb46d32b70",
+      "name": "Structured Output Parser7",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -608,
+        2160
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"fields\": [\n    {\n      \"name\": \"topic\",\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  ]\n}\n"
+      },
+      "id": "eb63fd5d-f3f4-440a-85d1-cafae1866bf6",
+      "name": "Structured Output Parser6",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -336,
+        2144
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "162f3410-dca0-4a1a-b294-b1436d6ade6f",
+              "name": "Post Topic",
+              "value": "={{ $json['Post Topic'] }}",
+              "type": "string"
+            },
+            {
+              "id": "e10992f0-16df-41e3-94b0-f20bcb663fb9",
+              "name": "Category",
+              "value": "={{ $json.Category }}",
+              "type": "string"
+            },
+            {
+              "id": "518d1a8b-b57f-43e9-a7a4-acc7773dc65f",
+              "name": "Target Audience",
+              "value": "={{ $json['Target Audience'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1bc847b1-f4f7-4f1d-8300-e72c3dc88a46",
+      "name": "Set Before Starting",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -144,
+        512
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "jsCode": "{\n  \"fields\": [\n    {\n      \"name\": \"topic\",\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        736
+      ],
+      "id": "757d1a0f-f4e6-416e-8816-c48a6750b7e7",
+      "name": "Code Tool"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Creator": {
+      "main": [
+        [
+          {
+            "node": "Hashtag Generator / SEO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Topic Generator": {
+      "main": [
+        [
+          {
+            "node": "Content Creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hashtag Generator / SEO": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Topic Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Creator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Hashtag Generator / SEO",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Set Before Starting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Hashtag Generator / SEO",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser7": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Set Before Starting": {
+      "main": [
+        [
+          {
+            "node": "Content Topic Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Topic Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "12478c10-29e7-4540-b454-012d74e345b6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e94411cbab7963b2335f95557f7cd65cd7cf3891914d4fe2eb8a5170c5fd3ed9"
+  },
+  "id": "hOtiNCfQIgBczPup",
+  "tags": []
+}
